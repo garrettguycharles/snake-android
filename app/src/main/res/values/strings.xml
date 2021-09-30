@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Snake Game</string>
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title">Snake</string>
+    <string name="play">Play</string>
+    <string name="play_again">Play Again</string>
+</resources>
