@@ -43,10 +43,6 @@ public class Snake extends Sprite {
 
     @Override
     public void draw(Canvas canvas) {
-
-        paint.setAntiAlias(true);
-        paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.RED);
 //        canvas.drawRect(getRect(), paint);
         RectF rect = getRect();
 
@@ -55,6 +51,75 @@ public class Snake extends Sprite {
         Float right = 0.0f;
         Float bottom = 0.0f;
         Integer startAngle = 0;
+
+        // draw tail
+
+        paint.setAntiAlias(false);
+        paint.setColor(Color.DKGRAY);
+        paint.setStyle(Paint.Style.FILL);
+
+        for (int i = 0; i < tail.size(); i++) {
+            // decide what type of segment this is
+
+            Rect previous = i > 0 ? tail.get(i - 1) : this;
+            Rect current = tail.get(i);
+            Rect next = i < tail.size() - 1 ? tail.get(i + 1) : null;
+
+            if (next == null) {
+                // shape is rounded butt
+
+                Vector2 midpoint = current.getCenter().approachAverage(previous.getCenter(), 1f);
+                canvas.drawCircle(midpoint.x, midpoint.y, current.getRadius(), paint);
+
+                canvas.drawCircle(current.centerX(), current.centerY(), current.getRadius(), paint);
+            } else {
+                Vector2 midpoint = previous.getCenter().approachAverage(next.getCenter(), 1f);
+
+                List<Vector2> anchors = List.of(
+                        current.getCenter(),
+                        current.getTopLeft(), current.getTopRight(),
+                        current.getBottomRight(), current.getBottomLeft()
+                );
+
+                Vector2 nearestAnchor = null;
+
+                // find nearest anchor
+                for (Vector2 anchor : anchors) {
+                    if (nearestAnchor == null) {
+                        nearestAnchor = anchor;
+                    } else if (anchor.distanceTo(midpoint) < nearestAnchor.distanceTo(midpoint)) {
+                        nearestAnchor = anchor;
+                    }
+                }
+
+                if (nearestAnchor == current.getCenter()) {
+                    // shape is square
+
+                    canvas.drawRect(current.getRect(), paint);
+                } else {
+                    // draw the snake arc
+
+                    left = midpoint.x - current.getW();
+                    right = midpoint.x + current.getW();
+                    top = midpoint.y - current.getH();
+                    bottom = midpoint.y + current.getH();
+
+                    Float angle = midpoint.angleTo(current.getCenter());
+
+                    System.out.println(
+                            previous.getCenter().to(current.getCenter()).angleBetween(current.getCenter().to(next.getCenter()))
+                    );
+
+                    canvas.drawArc(left, top, right, bottom, angle - 45, 90, true, paint);
+                }
+            }
+        }
+
+        // draw head
+
+        paint.setAntiAlias(true);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.RED);
 
         if (List.of(LEFT, RIGHT).contains(this.direction)) {
             top = rect.top;
@@ -88,68 +153,6 @@ public class Snake extends Sprite {
 
         canvas.drawArc(left, top, right, bottom, startAngle, 180, true, paint);
 
-        paint.setAntiAlias(false);
-
-        // draw tail
-        for (int i = 0; i < tail.size(); i++) {
-            // decide what type of segment this is
-
-            Rect previous = i > 0 ? tail.get(i - 1) : this;
-            Rect current = tail.get(i);
-            Rect next = i < tail.size() - 1 ? tail.get(i + 1) : null;
-
-            if (next == null || previous == null) {
-                // shape is square
-
-                paint.setColor(Color.DKGRAY);
-                paint.setStyle(Paint.Style.FILL);
-                canvas.drawRect(current.getRect(), paint);
-            } else {
-                Vector2 midpoint = previous.getCenter().approachAverage(next.getCenter(), 1f);
-
-                List<Vector2> anchors = List.of(
-                        current.getCenter(),
-                        current.getTopLeft(), current.getTopRight(),
-                        current.getBottomRight(), current.getBottomLeft()
-                );
-
-                Vector2 nearestAnchor = null;
-
-                // find nearest anchor
-                for (Vector2 anchor : anchors) {
-                    if (nearestAnchor == null) {
-                        nearestAnchor = anchor;
-                    } else if (anchor.distanceTo(midpoint) < nearestAnchor.distanceTo(midpoint)) {
-                        nearestAnchor = anchor;
-                    }
-                }
-
-                if (nearestAnchor == current.getCenter()) {
-                    // shape is square
-
-                    paint.setColor(Color.DKGRAY);
-                    paint.setStyle(Paint.Style.FILL);
-                    canvas.drawRect(current.getRect(), paint);
-                } else {
-                    // draw the snake arc
-
-                    left = midpoint.x - current.getW();
-                    right = midpoint.x + current.getW();
-                    top = midpoint.y - current.getH();
-                    bottom = midpoint.y + current.getH();
-
-                    Float angle = midpoint.angleTo(current.getCenter());
-
-                    System.out.println(
-                            previous.getCenter().to(current.getCenter()).angleBetween(current.getCenter().to(next.getCenter()))
-                    );
-
-                    paint.setColor(Color.BLUE);
-                    paint.setStyle(Paint.Style.FILL);
-                    canvas.drawArc(left, top, right, bottom, angle - 45, 90, true, paint);
-                }
-            }
-        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)

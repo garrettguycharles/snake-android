@@ -90,13 +90,6 @@ public class Vector2 {
     }
 
     public float angleBetween(Vector2 other) {
-//        float theta = this.absAngleBetween(other);
-//        if (this.rotate(theta).absAngleBetween(other) > theta) {
-//            return -theta;
-//        }
-//
-//        return theta;
-
         Float toReturn = other.getAngle() - this.getAngle();
 
         while (toReturn > 180f) {
