@@ -20,6 +20,7 @@ import com.garrettcharles.gamelibrary.Joystick;
 import com.garrettcharles.gamelibrary.Point;
 import com.garrettcharles.singleton.Cache;
 
+@RequiresApi(api = Build.VERSION_CODES.O)
 public class SnakeGame extends Game {
 
     MediaPlayer mPlayer;

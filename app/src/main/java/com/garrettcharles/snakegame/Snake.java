@@ -55,10 +55,9 @@ public class Snake extends Sprite {
         // draw tail
 
         paint.setAntiAlias(false);
-        paint.setColor(Color.DKGRAY);
         paint.setStyle(Paint.Style.FILL);
 
-        for (int i = 0; i < tail.size(); i++) {
+        for (int i = tail.size() - 1; i >= 0; i--) {
             // decide what type of segment this is
 
             Rect previous = i > 0 ? tail.get(i - 1) : this;
@@ -67,12 +66,14 @@ public class Snake extends Sprite {
 
             if (next == null) {
                 // shape is rounded butt
+                paint.setColor(Color.argb(255, 77, 94, 78));
 
                 Vector2 midpoint = current.getCenter().approachAverage(previous.getCenter(), 1f);
                 canvas.drawCircle(midpoint.x, midpoint.y, current.getRadius(), paint);
 
                 canvas.drawCircle(current.centerX(), current.centerY(), current.getRadius(), paint);
             } else {
+                paint.setColor(Color.argb(255, 0, 156, 8));
                 Vector2 midpoint = previous.getCenter().approachAverage(next.getCenter(), 1f);
 
                 List<Vector2> anchors = List.of(
@@ -95,9 +96,11 @@ public class Snake extends Sprite {
                 if (nearestAnchor == current.getCenter()) {
                     // shape is square
 
+
+                    paint.setColor(Color.argb(255, 0, 156, 8));
                     canvas.drawRect(current.getRect(), paint);
                 } else {
-                    // draw the snake arc
+                    // draw the head arc
 
                     left = midpoint.x - current.getW();
                     right = midpoint.x + current.getW();
@@ -105,10 +108,6 @@ public class Snake extends Sprite {
                     bottom = midpoint.y + current.getH();
 
                     Float angle = midpoint.angleTo(current.getCenter());
-
-                    System.out.println(
-                            previous.getCenter().to(current.getCenter()).angleBetween(current.getCenter().to(next.getCenter()))
-                    );
 
                     canvas.drawArc(left, top, right, bottom, angle - 45, 90, true, paint);
                 }
@@ -119,7 +118,7 @@ public class Snake extends Sprite {
 
         paint.setAntiAlias(true);
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.RED);
+        paint.setColor(Color.argb(255, 138, 230, 39));
 
         if (List.of(LEFT, RIGHT).contains(this.direction)) {
             top = rect.top;
@@ -177,11 +176,13 @@ public class Snake extends Sprite {
         moving = true;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public void stop() {
         moving = false;
         ((SnakeGame) Cache.getInstance().getGame()).navigateToGameOverScreen();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public void scheduledMovement() {
         Point previousPosition = new Point(getLeft(), getTop());
 
