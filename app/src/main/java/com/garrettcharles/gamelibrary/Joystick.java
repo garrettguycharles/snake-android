@@ -11,18 +11,18 @@ import com.garrettcharles.singleton.Touches;
 
 public class Joystick extends Sprite {
 
-    private Vector2d position;
-    private Vector2d homePosition;
+    private Vector2 position;
+    private Vector2 homePosition;
     private boolean pressed = false;
-    private Vector2d hatPosition;
+    private Vector2 hatPosition;
     private float hatRadius;
     private boolean active;
 
     public Joystick(float left, float top, float diameter) {
         super(left, top, diameter, diameter);
 
-        this.position = new Vector2d(0, 0);
-        this.homePosition = Vector2d.from(this.position);
+        this.position = new Vector2(0, 0);
+        this.homePosition = Vector2.from(this.position);
         this.hatPosition = new Point(centerX(), centerY());
         this.hatRadius = getRadius() / 2;
     }
@@ -50,7 +50,7 @@ public class Joystick extends Sprite {
         paint.setAlpha(0x90);
 
         Path underHatPath = new Path();
-        Point underHatPathPencil = Point.from(Vector2d.up().scale(getRadius() * 0.7f));
+        Point underHatPathPencil = Point.from(Vector2.up().scale(getRadius() * 0.7f));
         Point underHatPathStart = Point.from(getCenter().add(underHatPathPencil));
         underHatPath.moveTo(underHatPathStart.x, underHatPathStart.y);
 
@@ -87,7 +87,7 @@ public class Joystick extends Sprite {
             this.hatPosition = getCenter().to(touchPoint);
             this.hatPosition = hatPosition.scale((float) (Math.min(1.0, getHatRadius() / hatPosition.getMagnitude())));
 
-            Vector2d newPosition = getHatPosition().normalize().scale(getHatPosition().getMagnitude() / getHatRadius());
+            Vector2 newPosition = getHatPosition().normalize().scale(getHatPosition().getMagnitude() / getHatRadius());
 
             if (newPosition.getMagnitude() > 0.2) {
                 position = newPosition;
@@ -133,7 +133,7 @@ public class Joystick extends Sprite {
         return;
     }
 
-    public Vector2d getPosition() {
+    public Vector2 getPosition() {
         return position;
     }
 
@@ -145,7 +145,7 @@ public class Joystick extends Sprite {
         return pressed && active;
     }
 
-    private Vector2d getHatPosition() {
+    private Vector2 getHatPosition() {
         return hatPosition;
     }
 
@@ -154,6 +154,6 @@ public class Joystick extends Sprite {
     }
 
     public void updateHomePosition() {
-        this.homePosition = Vector2d.from(getCenter());
+        this.homePosition = Vector2.from(getCenter());
     }
 }

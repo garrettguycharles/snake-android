@@ -8,6 +8,7 @@ import static com.garrettcharles.gamelibrary.Utils.UP;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.os.Build;
 
 import androidx.annotation.RequiresApi;
@@ -16,6 +17,7 @@ import com.garrettcharles.gamelibrary.Joystick;
 import com.garrettcharles.gamelibrary.Point;
 import com.garrettcharles.gamelibrary.Rect;
 import com.garrettcharles.gamelibrary.Sprite;
+import com.garrettcharles.gamelibrary.Vector2;
 import com.garrettcharles.singleton.Cache;
 
 import java.util.ArrayList;
@@ -45,15 +47,108 @@ public class Snake extends Sprite {
         paint.setAntiAlias(true);
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(Color.RED);
-        canvas.drawRect(getRect(), paint);
+//        canvas.drawRect(getRect(), paint);
+        RectF rect = getRect();
+
+        Float left = 0.0f;
+        Float top = 0.0f;
+        Float right = 0.0f;
+        Float bottom = 0.0f;
+        Integer startAngle = 0;
+
+        if (List.of(LEFT, RIGHT).contains(this.direction)) {
+            top = rect.top;
+            bottom = rect.bottom;
+
+            if (direction == LEFT) {
+                right = rect.right + rect.width();
+                startAngle = 90;
+            } else {
+                right = rect.right;
+                startAngle = 270;
+            }
+
+            left = right - rect.width() * 2;
+        }
+
+        if (List.of(UP, DOWN).contains(this.direction)) {
+            left = rect.left;
+            right = rect.right;
+
+            if (direction == UP) {
+                top = rect.top;
+                startAngle = 180;
+            } else {
+                top = rect.top - rect.height();
+                startAngle = 0;
+            }
+
+            bottom = top + rect.height() * 2;
+        }
+
+        canvas.drawArc(left, top, right, bottom, startAngle, 180, true, paint);
 
         paint.setAntiAlias(false);
 
+        // draw tail
         for (int i = 0; i < tail.size(); i++) {
-            paint.setColor(Color.DKGRAY);
-            paint.setStyle(Paint.Style.FILL);
-            canvas.drawRect(tail.get(i).getRect(), paint);
+            // decide what type of segment this is
 
+            Rect previous = i > 0 ? tail.get(i - 1) : this;
+            Rect current = tail.get(i);
+            Rect next = i < tail.size() - 1 ? tail.get(i + 1) : null;
+
+            if (next == null || previous == null) {
+                // shape is square
+
+                paint.setColor(Color.DKGRAY);
+                paint.setStyle(Paint.Style.FILL);
+                canvas.drawRect(current.getRect(), paint);
+            } else {
+                Vector2 midpoint = previous.getCenter().approachAverage(next.getCenter(), 1f);
+
+                List<Vector2> anchors = List.of(
+                        current.getCenter(),
+                        current.getTopLeft(), current.getTopRight(),
+                        current.getBottomRight(), current.getBottomLeft()
+                );
+
+                Vector2 nearestAnchor = null;
+
+                // find nearest anchor
+                for (Vector2 anchor : anchors) {
+                    if (nearestAnchor == null) {
+                        nearestAnchor = anchor;
+                    } else if (anchor.distanceTo(midpoint) < nearestAnchor.distanceTo(midpoint)) {
+                        nearestAnchor = anchor;
+                    }
+                }
+
+                if (nearestAnchor == current.getCenter()) {
+                    // shape is square
+
+                    paint.setColor(Color.DKGRAY);
+                    paint.setStyle(Paint.Style.FILL);
+                    canvas.drawRect(current.getRect(), paint);
+                } else {
+                    // draw the snake arc
+
+                    left = midpoint.x - current.getW();
+                    right = midpoint.x + current.getW();
+                    top = midpoint.y - current.getH();
+                    bottom = midpoint.y + current.getH();
+
+                    Float angle = midpoint.angleTo(current.getCenter());
+
+                    System.out.println(
+                            previous.getCenter().to(current.getCenter()).angleBetween(current.getCenter().to(next.getCenter()))
+                    );
+
+                    paint.setColor(Color.BLUE);
+                    paint.setStyle(Paint.Style.FILL);
+                    canvas.drawArc(left, top, right, bottom, angle - 45, 90, true, paint);
+                }
+            }
         }
     }
 

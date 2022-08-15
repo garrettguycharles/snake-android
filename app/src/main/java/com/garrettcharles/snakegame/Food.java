@@ -29,8 +29,8 @@ public class Food extends Sprite {
         Boundary boundary = Cache.getInstance().getBoundary();
 
         do {
-            setLeft(Utils.random_range(boundary.getLeft(), boundary.getRight()));
-            setTop(Utils.random_range(boundary.getTop(), boundary.getBottom()));
+            setLeft(Utils.random_range(boundary.getLeft(), boundary.getRight() - 1));
+            setTop(Utils.random_range(boundary.getTop(), boundary.getBottom() - 1));
             setLeft(getLeft() - (getLeft() - boundary.getLeft()) % getW());
             setTop(getTop() - (getTop() - boundary.getTop()) % getH());
         } while (Cache.getInstance().getPlayer().isTouching(this));

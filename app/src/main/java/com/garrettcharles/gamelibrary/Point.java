@@ -1,6 +1,6 @@
 package com.garrettcharles.gamelibrary;
 
-public class Point extends Vector2d {
+public class Point extends Vector2 {
     public Point(float x, float y) {
         super(x, y);
     }
@@ -9,7 +9,7 @@ public class Point extends Vector2d {
         return new Point(this.x, this.y);
     }
 
-    public static Point from(Vector2d v) {
+    public static Point from(Vector2 v) {
         return new Point(v.x, v.y);
     }
 }
